@@ -1,6 +1,6 @@
-第二版整理的检测项解答
+## 第二版整理的检测项解答
 仅供参考，具体结果因人而异
-by SuXiaoMing
+by mingzun09(SuXiaoMing)
 
 1.异常进程组
 与LSP有关
