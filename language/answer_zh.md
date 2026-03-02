@@ -102,30 +102,31 @@ APatch请使用Nohello.kpm模块隐藏
 （dev和/data/local/tmp目录下的文件检查，重命名/删除相关目录）建议格式化系统或者线刷
 自行排查异常文件（你对设备做了什么事情，你应该记得在哪里）
 也可以排除并删除以下路径的文件/文件夹：
-/data/local/stryker
-/data/system/AppRetention
-/data/local/tmp/luckys
-/data/local/tmp/input_devices
-/data/local/tmp/HyperCeiler
-/data/local/tmp/simpleHook
-/data/local/tmp/DisabledAllGoogleServices
-/data/local/MIO
-/data/DNA
-/data/local/tmp/cleaner_starter
-/data/local/tmp/byyang
-/data/local/tmp/mount_mask
-/data/local/tmp/mount_mark
-/data/local/tmp/scriptTMP
-/data/local/luckys
-/data/local/tmp/horae_control.log
-/data/gpu_freq_table.conf
-/storage/emulated/0/Download/advanced
-/storage/emulated/0/Documents/advanced
-/data/system/NoActive
-/data/system/Freezer
-/storage/emulated/0/Android/naki
-/data/swap_config.conf
-/data/local/tmp/resetprop
+
+### /data/local/stryker
+### /data/system/AppRetention
+### /data/local/tmp/luckys
+### /data/local/tmp/input_devices
+### /data/local/tmp/HyperCeiler
+### /data/local/tmp/simpleHook
+### /data/local/tmp/DisabledAllGoogleServices
+### /data/local/MIO
+### /data/DNA
+### /data/local/tmp/cleaner_starter
+### /data/local/tmp/byyang
+### /data/local/tmp/mount_mask
+### /data/local/tmp/mount_mark
+### /data/local/tmp/scriptTMP
+### /data/local/luckys
+### /data/local/tmp/horae_control.log
+### /data/gpu_freq_table.conf
+### /storage/emulated/0/Download/advanced
+### /storage/emulated/0/Documents/advanced
+### /data/system/NoActive
+### /data/system/Freezer
+### /storage/emulated/0/Android/naki
+### /data/swap_config.conf
+### /data/local/tmp/resetprop
 
 ## 发现GG修改器运行痕迹
 删除/storage/emulated/0/legacy文件夹
