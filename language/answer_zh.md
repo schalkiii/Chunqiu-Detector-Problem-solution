@@ -36,10 +36,11 @@
 ---
 
 ## 文件/目录权限/路径异常
-### 05. futile hode（tmp 异常）
-- 特征：/data/local/tmp/ 目录被修改
+### 05. /data/local/tmp denied
+- 特征：/data/local/tmp 目录被修改
+- 文件夹权限被修改.被删除过.等
 - 解决方案（二选一）：
-  1. 恢复目录（Susfs / 格式化，不推荐）
+  1. 恢复目录Susfs隐藏 / 格式化（不推荐）
   2. 删除原 tmp 文件夹，在 /data/local/ 下任选一个文件夹重命名为 tmp
 
 ### 06. Suspicious Surroundings(a/b/c)
