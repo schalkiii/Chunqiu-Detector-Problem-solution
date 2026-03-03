@@ -1,296 +1,292 @@
-# 春秋检测项解决方案（跟进最新版本）
-> 整理：mingzun09(SuXiaoMing) | 仅供参考，具体结果因设备/环境而异
+## 第三版整理的检测项解答
+仅供参考，具体结果因人而异
+by mingzun09(SuXiaoMing)
 
-## 目录
-- [进程/服务类异常](#进程服务类异常)
-- [文件/目录权限/路径异常](#文件目录权限路径异常)
-- [系统属性/内核/密钥异常](#系统属性内核密钥异常)
-- [模块/工具残留异常](#模块工具残留异常)
-- [环境/挂载/隐藏类异常](#环境挂载隐藏类异常)
-- [其他杂项检测](#其他杂项检测)
+## 异常进程组
+与LSP有关
+在设置中找到应用多开，随便多开一个应用，原理就是创建999用户，这个检测点就会消失，但可能会出现另一条。
+更新系统至最新，Android安全更新日期为2026-2-1
+更新LSP it
 
----
+## Evil Service
+与zygisk next关系
+如果使用的是ksu（sukisu ksunext等分支）则在zygisk里打开仅还原挂载模式
+如果是magisk（alpha和Kitsune）则在zygisk next中开启强制模式
 
-## 进程/服务类异常
-### 01. 异常进程组
-- 关联项：LSP
-- 解决方案：
-  1. 设置中开启「应用多开」（任意应用），原理是创建999用户可消除该检测点
-  2. 系统更新至最新（Android安全更新日期≥2026-2-1）
-  3. 更新 LSP 模块至最新版
+## Found Injection (a)
+大多数都和调度有关系，满血核心模块会导致这个问题
+可自行排除模块
 
-### 02. Evil Service
-- 关联项：Zygisk Next
-- 解决方案：
-  - KSU 分支（sukisu/ksunext 等）：Zygisk 中开启「仅还原挂载模式」
-  - Magisk 分支（Alpha/Kitsune）：Zygisk Next 中开启「强制模式/仅还原挂载模式」（部分设备可能无效）
+## Magisk/sukisu?/隐藏/Dirty file 
+根据作者所说含有以下字样的文件都会显示这条"magisk","sukisu","alpha","zygisk","riru","lsposed","xposed","root", "刷机","hide","ksu","shamiko","tircky"检测路径在内部，存储目录只需要在这目录下删除就行 另外就是，xiaomi在应用截图中会在图片名称添加应用的名字 所以你在root管理器的截图就有可能被识别 Android系统安全补丁较新，没有零宽漏洞就可能不会被识别（或者使用FuseFixer模块xp）
 
-### 03. 异常进程 xxxx（PID）
-- 特征：通常为 LSP 进程
-- 解决方案：无视 / 卸载 LSP 模块 / 自行排查对应 PID 进程（可通过进程工具定位）
+## Tampered Attestation Key 
+被篡改的密钥新的检测点，有人烧录之后可以过掉它，但是有的人没有效果，建议等ts更新
 
-### 04. Evil loop
-- 特征：文件夹权限异常为 000（模块/手动修改导致）
-- 解决方案：将对应文件夹权限改为 555
+## 审计日志伪造 
+使用ZN-AuditPatch模块/susfs的avc伪造
+会导致这个问题，可以等此模块更新解决
+或者更新系统至Android安全更新2025-09-01（各oem合入修复并发版日期不同）
 
----
+##futile hode（tmp异常） 
+目录/data/local/tmp/被修改过
+自行尝试恢复（使用susfs或者格式化）
+!不推荐
+也可以删除tmp文件夹在/data/local/目录下随便选一个文件夹把名称改为tmp
 
-## 文件/目录权限/路径异常
-### 05. /data/local/tmp denied
-- 特征：/data/local/tmp 目录被修改
-- 文件夹权限被修改.被删除过.等
-- 解决方案（二选一）：
-  1. 恢复目录Susfs隐藏 / 格式化（不推荐）
-  2. 删除原 tmp 文件夹，在 /data/local/ 下任选一个文件夹重命名为 tmp
+## 实验性检测2(概率误报测试中) 
+此检测项已被删除
 
-### 06. Suspicious Surroundings(a/b/c)
-- 检测路径：/data/local/tmp
-- 细分解决方案：
-  - (a)：tmp 文件夹所属用户/组改为 shell（默认 root 导致检测）
-  - (b)：tmp 的 inode 值高于 10000 → 参考「05. futile hode」解决
-  - (c)：tmp 权限改为 771（当前非 771 触发检测）
+## 虚拟机环境
+（特别改机型模块或者prop被修改，关掉模块或还原prop）
 
-### 07. MT2/异常文件
-- 特征：根目录存在「mt2」文件夹 / .sh/.img 等异常文件
-- 解决方案：
-  1. MT 管理器设置中修改默认路径名称，删除旧 mt2 文件夹
-  2. 根目录下删除 .sh/.img 等异常文件
+## 环境异常a
+与牛头Abnormal Environment一样
+APatch请尝试使用kpm模块解决
 
-### 08. 发现GG修改器运行痕迹
-- 解决方案：删除路径 `/storage/emulated/0/legacy`
+## 发现隐藏的UID
+（/sys/fs/cgroup/找到的UID,sus挂载隐藏，或者自行排查）
 
-### 09. Covert test (10)
-- 特征：外部存储存在 sh 脚本
-- 解决方案：删除脚本 / 移至检测工具无法读取的目录
+## 风险应用
+发现了风险应用
+卸载风险应用/使用susfs隐藏/使用HMA-OSS隐藏/自行尝试隐藏
 
-### 10. 异常文件/Suspicious Files（通用）
-- 检测路径：dev / /data/local/tmp
-- 解决方案：
-  1. 重命名/删除相关目录文件（建议格式化系统/线刷）
-  2. 排查并删除以下高危路径：
-     ```
-     /data/local/stryker
-     /data/system/AppRetention
-     /data/local/tmp/luckys
-     /data/local/tmp/input_devices
-     /data/local/tmp/HyperCeiler
-     /data/local/tmp/simpleHook
-     /data/local/tmp/DisabledAllGoogleServices
-     /data/local/MIO
-     /data/DNA
-     /data/local/tmp/cleaner_starter
-     /data/local/tmp/byyang
-     /data/local/tmp/mount_mask
-     /data/local/tmp/mount_mark
-     /data/local/tmp/scriptTMP
-     /data/local/luckys
-     /data/local/tmp/horae_control.log
-     /data/gpu_freq_table.conf
-     /storage/emulated/0/Download/advanced
-     /storage/emulated/0/Documents/advanced
-     /data/system/NoActive
-     /data/system/Freezer
-     /storage/emulated/0/Android/naki
-     /data/swap_config.conf
-     /data/local/tmp/resetprop
-     ```
+## Tampered Attestation(a)/(b)
+(a)为密钥发生替换，清除春秋全部数据可消失或变其他词条；
+(b)*为不稳定测试，无需处理
 
-### 11. /system/bin/xxx 异常
-- 常见触发项：/system/bin/adb / fastboot / imgbox
-- 原因：刷入刷机工具类模块
-- 解决方案：卸载对应刷机工具模块
+## bl状态异常 
+刷入Tricky Store并添加包名
 
----
+## MT2/异常文件
+根目录下有“mt2”文件夹，在Mt管理器设置中修改默认路径名称并删除旧的mt2文件夹
+异常文件就是字面意思（根目录下有.sh或者.img等文件）
 
-## 系统属性/内核/密钥异常
-### 12. Magisk/sukisu/隐藏/Dirty file
-- 检测特征：文件含关键词（magisk/sukisu/alpha/zygisk/riru/lsposed/xposed/root/刷机/hide/ksu/shamiko/tircky）
-- 解决方案：
-  1. 删除存储目录下含上述关键词的文件
-  2. 避免在 root 管理器截图（小米截图会包含应用名）
-  3. 升级 Android 安全补丁（无零宽漏洞可规避检测）/ 安装 FuseFixer 模块
+## Abnormal Environment(02) 
+检查到HyperCeiler残留
+用sh脚本运以下指令
+resetprop persist.hyperceiler.log.level ""
+resetprop --delete persist.hyperceiler.log.level
 
-### 13. Tampered Attestation Key
-- 特征：密钥被篡改（新检测点）
-- 解决方案：尝试烧录密钥（效果因人而异）/ 等待 TS 模块更新
+## Suspicious Surroundings(a/b/c)（/data/local/tmp路径
+(a)：tmp文件夹设为root用户和所有组，改为shell
+(b)：tmp的inode值高于10000，可以参考检测项7解决
+(c)：tmp权限不为771，设置为771）
 
-### 14. ro.boot.vbmeta.avb_version=报错的值
-- 特征：AVB 版本异常（模块修改导致）
-- 解决方案：排查修改该属性的模块 / 查看第17条
+## Found lnjection 01,02,03
+更新zygisk next模块及LSP模块
 
-### 15. 伪装内核版本和第三方内核
-- 解决方案：Susfs 伪装时勾选 post-data，使用原厂内核构建信息
+## Miscellaneous Check (13)
+使用susfs模块
 
-### 16. Tampered Attestation(a)/(b)
-- 细分解决方案：
-  - (a)：密钥替换 → 清除春秋全部数据
-  - (b)：不稳定测试项 → 无需处理
+## ro.boot.vbmeta.avb_version=报错的值
+（部分模块导致，可自行排查）
 
-### 17. 不合法的哈希值
-- 解决方案：
-  1. Native Detector 获取 Boot 哈希值
-  2. 创建 sh 脚本，root 执行：
-     ```sh
-     resetprop ro.boot.vbmeta.digest 自身哈希值
-     ```
-  3. 或使用 Tricky Store + TS 插件配置哈希值
+## 伪装内核版本和第三方内核
+（使用susfs伪装时勾选post-data，用原厂内核构建信息）
 
-### 18. 不受信任keyAttestation
-- 解决方案：更换有效 keybox
+## 找到隐藏应用路径
+（sus路径隐藏/随机包名/使用HMA）
 
-### 19. 密钥篡改！！！ / 秘钥篡改（128）
-- 原因：Tricky Store 包名文件中添加「!」强制模式导致
-- 解决方案：删除「!」符号 / 改为「?」符号
+## Evil loop
+（权限异常为000，模块修改或自行修改导致，将文件夹改为555权限）
 
-### 20. 密钥吊销
-- 特征：keybox 被吊销
-- 解决方案：更换 keybox
+## Abnormal Environment 
+侧信道检测，更新根管理器
 
----
+## AbnormalEnvironment(04)/(01)、Detected anomalous file(Miscellaneous(a))、Cavert test(a)
+（dev和/data/local/tmp目录下的文件检查，重命名/删除相关目录）建议格式化系统或者线刷
 
-## 模块/工具残留异常
-### 21. 审计日志伪造
-- 关联项：ZN-AuditPatch/Susfs AVC 伪造
-- 解决方案：等待模块更新 / 更新系统至 Android 安全更新 2025-09-01+（各 OEM 合入时间不同）
+## 发现GG修改器运行痕迹
+（删除/storage/emulated/0/legacy文件夹）
 
-### 22. Abnormal Environment(02)
-- 特征：检测到 HyperCeiler 残留
-- 解决方案：执行以下 sh 指令：
-  ```sh
-  resetprop persist.hyperceiler.log.level ""
-  resetprop --delete persist.hyperceiler.log.level
-  ```
+## Abnormal Environment(01)
+自行排查异常文件（你对设备做了什么事情，你应该记得在哪里）
+解决方案：删除以下路径的文件/文件夹：
+/data/local/stryker
+/data/system/AppRetention
+/data/local/tmp/luckys
+/data/local/tmp/input_devices
+/data/local/tmp/HyperCeiler
+/data/local/tmp/simpleHook
+/data/local/tmp/DisabledAllGoogleServices
+/data/local/MIO
+/data/DNA
+/data/local/tmp/cleaner_starter
+/data/local/tmp/byyang
+/data/local/tmp/mount_mask
+/data/local/tmp/mount_mark
+/data/local/tmp/scriptTMP
+/data/local/luckys
+/data/local/tmp/horae_control.log
+/data/gpu_freq_table.conf
+/storage/emulated/0/Download/advanced
+/storage/emulated/0/Documents/advanced
+/data/system/NoActive
+/data/system/Freezer
+/storage/emulated/0/Android/naki
+/data/swap_config.conf
+/data/local/tmp/resetprop
 
-### 23. Found Injection (a)/Found Injection 01,02,03
-- 常见原因：调度模块（如满血核心）/ LSP/Zygisk 版本过旧
-- 解决方案：
-  1. 排查并卸载调度类模块
-  2. 更新 Zygisk Next 及 LSP 模块至最新版
+## found## scene(1,2,3,4）
+不使用scene或者无视
 
-### 24. 发现外挂文件
-- 解决方案：按检测提示路径删除对应文件
+## 风险应用[检测数量]
+（随机包名或者使用HMA，路径暴露需sus路径隐藏）
 
-### 25. found evil version
-- 解决方案：关闭 Scene 无障碍列表权限 → 重启手机
+## 不受信任keyAttestation
+（更换有效keybox）
 
-### 26. play lntegrity fix
-- 解决方案：更换/卸载 play integrity fix 模块
+## tee损坏
+使用Tricky Store模块解决
 
-### 27. Found Rekernel Module
-- 解决方案：更新 Rekernel / 卸载 Rekernel（如有条件）
+## Found bl hide
+（发现隐藏BL列表，自行排查）
 
-### 28. Found XP
-- 特征：检测到 HyperCeiler 等 XP 模块 / 相关文件
-- 解决方案：清除 /data/local/tmp/ 下所有文件 / 卸载对应模块
+## ADB[running] 
+USB调试已开启（开发者选项关闭，一加无需处理）
 
----
+## Found Su
+发现了Su，除非susfs出现bug或者Magsik没做隐藏就不会出现（也可能某人傻到对检测软件授权su）
 
-## 环境/挂载/隐藏类异常
-### 29. 虚拟机环境
-- 原因：改机型模块 / prop 被修改
-- 解决方案：关闭改机型模块 / 还原 prop
+## Found XP
+（检测到文件或类似HyperCeiler模块，清除/data/local/tmp/下所有文件或卸载该模块）
 
-### 30. 环境异常a / Abnormal Environment / AbnormalEnvironment(04)/(01)
-- 特征：侧信道检测 / APatch 环境异常
-- 解决方案：
-  1. 更新根管理器
-  2. APatch 用户：安装 Nohello.kpm 模块隐藏
-  3. 重命名/删除 dev / /data/local/tmp 下异常文件
+## 不合法的哈希值
+用密钥验证/Native Detector获取Boot哈希值，创建sh脚本，root执行resetprop ro## boot## vbmeta## digest 自身哈希值
+或者使用Tricky Store搭配TS插件并配置哈希值
 
-### 31. 发现隐藏的UID
-- 检测路径：/sys/fs/cgroup/
-- 解决方案：Sus 挂载隐藏 / 自行排查
+## Covert test (10)
+（外部存储存在sh脚本，删除或者整理后放无法读取目录下）
 
-### 32. 风险应用 / 风险应用[检测数量]
-- 解决方案：卸载风险应用 / Susfs 隐藏 / HMA-OSS 隐藏 / 随机包名
+## 春秋已被隐藏应用列表隐藏/试图隐藏应用
+字面意思
 
-### 33. bl状态异常 / tee损坏 / BL已解锁或密钥异常
-- 解决方案：
-  1. 刷入 Tricky Store 模块
-  2. 在 `/data/adb/tricky_store/target.txt` 中添加检测器包名（BL异常需加英文!）
+## 发现外挂文件
+（按提示删除）
 
-### 34. 找到隐藏应用路径
-- 解决方案：Sus 路径隐藏 / 随机包名 / 使用 HMA
+## hide hook
+（检测到被hook，打开lsp取消对春秋检测的模块作用域勾选）
 
-### 35. 发现可疑挂载
-- 原因：未用模块隐藏挂载
-- 解决方案：使用 Susfs / Zygisk Next 开启仅还原挂载
+## found evil version
+（无障碍列表关闭scene启用并重启手机）
 
-### 36. Bootloader unlock/启动状态异常
-- 解决方案：使用 Tricky Store 隐藏
+## Abnormal Environment（n）
+（按提示目录删除）
 
-### 37. ADB[running]
-- 特征：USB调试已开启
-- 解决方案：开发者选项中关闭 USB 调试
+## 第三方rom(01)
+（无视或者换回官方rom也可自行尝试解决）
 
-### 38. Found Su
-- 触发条件：Susfs 漏洞 / Magisk 未隐藏 / 对检测软件授权 Su
-- 解决方案：修复 Susfs / 重新隐藏 Magisk / 取消检测软件 Su 授权
+## play lntegrity fix
+更换play lntegrity fix模块或者卸载
 
-### 39. hide hook
-- 特征：检测到 Hook 行为
-- 解决方案：LSP 中取消对春秋检测的模块作用域勾选
+## 发现异常修改
+未知，或许软件包被篡改？
 
-### 40. Mount loophole / Magic Mount
-- 特征：通常同时出现
-- 解决方案：对检测器开启排除列表 / 卸载 Zygisk Next 等挂载类模块
+## Found Rekernel Module
+发现ReKernel，更新Rekernel
 
-### 41. SU list
-- 特征：对检测器开启排除后出现（不稳定）
-- 解决方案：无视（时有时无，无强影响）
+## Conventiona Tests(a/b)
+（未知）
 
-### 42. 检测到scene端口占用
-- 特征：检测到 Scene daemon 进程
-- 解决方案：卸载 Scene / 关闭 Scene 无障碍权限 / Susfs 隐藏 / 无视
+## 密钥篡改！！！
+检测到烧录tee等行为
 
----
+## 发现可疑挂载
+（未用模块隐藏挂载导致）
+使用susfs或者zygisk next开启仅还原挂载
 
-## 其他杂项检测
-### 43. Miscellaneous Check (13)
-- 特征：通常与其他问题同时出现
-- 解决方案：使用 Susfs 模块
+## Found Scene＞＞/dev/cpuset/scene-daemon
+发现scene daemon
+卸载scene或者无视
 
-### 44. 当前设备机型已被篡改
-- 特征：2.6.4 扫盘测试项（后续更名 Property Modified）
-- 解决方案：参考「Property Modified」
+## BL已解锁
+设备已解锁，用Tricky Store隐藏
 
-### 45. Property Modified
-- 特征：系统属性被修改
-- 解决方案：
-  1. 排查修改属性的模块 / 隐藏系统属性
-  2. 将 Shamiko 模块的 service.sh 移至 `/data/adb/service.d/` → 重启
+## 异常文件
+（按路径删除）
 
-### 46. 春秋已被隐藏应用列表隐藏/试图隐藏应用
-- 特征：字面意思（检测到隐藏行为）
-- 解决方案：调整隐藏策略（如改用 Susfs 而非应用列表隐藏）
+## Found LSPHook Framework
+（某些xposed模块导致，可以通过排除法提供）
 
-### 47. 系统异常修改>>com.android.camera
-- 原因：移植相机 / 非原版相机（非系统签名）
-- 解决方案：使用 HMA 让春秋无法读取相机信息（后期可能被检测）
+## Abnormal Environment
+（存在## sh或隐藏应用列表配置等风险文件）
 
-### 48. Miscellaneous Check(a)/Cavert test(a)/Detected anomalous file
-- 解决方案：格式化系统 / 线刷 / 排查并删除异常文件
+## 密钥吊销
+（keybox被吊销）
+更换keybox
 
-### 49. Abnormal Environment(09)
-- 特征：未知触发条件
-- 解决方案：暂无明确方案，建议排查近期修改的系统配置
+## 密钥基础校验未通过
+使用Tricky Store勾选包名
 
-### 50. Conventiona Tests(a/b)
-- 特征：未知触发条件
-- 解决方案：暂无明确方案，建议等待检测规则更新
+## 试图隐藏路径
+使用sus隐藏某路径导致，但使用方法不对导致被检测
 
-### 51. 发现异常修改
-- 特征：未知（疑似软件包被篡改）
-- 解决方案：排查系统文件完整性 / 重新安装检测软件
+## Abnormal Environment(09)
+未知
 
-### 52. 试图隐藏路径
-- 原因：Sus 隐藏路径使用方法错误
-- 解决方案：重新配置 Sus 路径隐藏规则
+## 获取失败的KeyAttestation 
+用Tricky Store强制模式（对包名前面加“!”符号）
 
-### 53. Found bl hide
-- 特征：发现隐藏BL列表
-- 解决方案：自行排查系统中隐藏BL的配置/模块
+## Tampered Kernel
+系统内核信息被篡改，还原未修改的boot## img或者尝试使用susfs隐藏
 
-### 54. Tampered Kernel
-- 特征：系统内核信息被篡改
-- 解决方案：还原未修改的boot.img / 使用susfs隐藏内核相关属性
+## 发现外挂驱动
+发现刷入了外挂驱动
+
+## BL已解锁或密钥异常
+在/data/adb/Tricky_Store/target## txt添加春秋包名+英文感叹号!
+
+## 异常的system挂载 路径
+（未知模块或其他因素产生的挂载）
+
+## 当前设备机型已被篡改
+（2.6.4扫盘测试项，后续改名为Property Modified）
+
+## 系统异常修改>>com.android.camera
+（移植系统的相机问题/不是原版相机,导致相机的前面不对,非系统签名,可以尝试使用HMA让春秋不可见相机试试（但后期可能会被检测））
+
+## Miscellaneous Check(a)
+（开启过隐藏应用列表（HMA）的Vold app data隔离,取消HMA的超级用户权限,再打开路径/data/property/persistent_properties后删除内部所有的文字并且保存再重启设备即可） 
+
+## Property Modified
+系统属性被修改
+自行排查模块或者隐藏系统属性
+也可以把shamiko模块的service.sh文件
+移动至/data/adb/service.d/目录下
+重启后可能解决
+
+## 秘钥篡改（128）
+Tricky Store是包名文件中对包名前面添加了“!”
+强制模式导致的
+
+## Mount loophole
+通常与Magic Mount同时出现
+对检测器开启排除列表后解决
+（需要卸载挂载的模块如zygisk next）
+
+## Magic Mount
+通常与Mount loophole同时出现
+对检测器开启排除列表后解决
+（需要卸载挂载的模块如zygisk next）
+
+## SU list
+对检测器开启排除后会出现
+但不稳定，时有时无
+
+## 检测到scene端口占用
+检测到scene的daemon进程
+卸载scene或者关闭scene的无障碍权限
+使用susfs隐藏也行，也可无视
+
+## 异常进程 xxxx（pid）
+根据给出的pid可使用工具查看对应的pid进程
+一般是LSP进程
+无视或者卸载LSP模块，也可自行琢磨解决
+
+## /system/bin/xxx
+一般会有/system/bin/adb
+/system/bin/fastboot
+/system/bin/imgbox
+这是在设备上刷入了刷机工具模块或类似的
+用于给其他设备刷写使用的，尝试卸载模块解决
