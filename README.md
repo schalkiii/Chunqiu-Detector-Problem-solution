@@ -6,7 +6,7 @@
 ## language
 Select one of the following languages to view the solution file.
 
-[中文](/language/answer_zh%20.md)|[English](/language/answe_eg.md)
+[中文](/language/answer_zh.md)|[English](/language/answer_en.md)
 
 ## Feedback or participate in translation
 You can branch and modify the warehouse and then pull the request, and I will check and decide whether to merge.
