@@ -127,8 +127,7 @@
 > 检测Pty
 
 ## 环境伪造
-> 检测到AVC伪造？
-> 旧版本的ZN-AuditPatch模块/susfs(avc）会这样？
+> 由“无影”提供的检测点，暂时未知原理
 
 ## ROOT进程
 > 检测Zygote环境?
